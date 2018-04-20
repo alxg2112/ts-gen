@@ -51,7 +51,7 @@ public class ReportGenerator {
 
 			Iterator<Row> rowIterator = reportSheet.iterator();
 
-			skipFirst(rowIterator, properties.getRowOffset());
+			skipNElements(rowIterator, properties.getRowOffset());
 
 			Iterator<List<String>> csvContentIterator = csvContent.iterator();
 
@@ -60,7 +60,7 @@ public class ReportGenerator {
 				Row currentRow = rowIterator.next();
 				Iterator<Cell> cellIterator = currentRow.cellIterator();
 
-				skipFirst(cellIterator, properties.getColumnOffset());
+				skipNElements(cellIterator, properties.getColumnOffset());
 
 				List<String> csvRow = csvContentIterator.next();
 				Iterator<String> csvValueIterator = csvRow.iterator();
@@ -85,7 +85,7 @@ public class ReportGenerator {
 		}
 	}
 
-	private void skipFirst(Iterator<?> iterator, int elementsToSkip) {
+	private void skipNElements(Iterator<?> iterator, int elementsToSkip) {
 		int remainingToSkip = elementsToSkip;
 		while (iterator.hasNext() && remainingToSkip-- > 0) {
 			iterator.next();
