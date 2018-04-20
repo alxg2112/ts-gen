@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 public class ReportGenerator {
 
 	private static final Splitter LF_SPLITTER = Splitter.on('\n');
-	private static final Splitter CSV_COMMA_SPLITTER = Splitter.on(',');
+	private static final Splitter COMMA_SPLITTER = Splitter.on(',');
 
 	private final ReportGeneratorProperties properties;
 
@@ -41,7 +41,7 @@ public class ReportGenerator {
 		List<String> csvLines = LF_SPLITTER.omitEmptyStrings().splitToList(rawCsvContent);
 
 		List<List<String>> csvContent = csvLines.stream()
-				.map(CSV_COMMA_SPLITTER::split)
+				.map(COMMA_SPLITTER::split)
 				.map(Lists::newArrayList)
 				.collect(Collectors.toList());
 
