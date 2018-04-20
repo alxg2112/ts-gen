@@ -47,9 +47,9 @@ public class ReportGenerator {
 
 		FileInputStream excelTemplateFile = new FileInputStream(new File(properties.getTemplateFilename()));
 		try (Workbook workbook = new XSSFWorkbook(excelTemplateFile)) {
-			Sheet tsSheet = workbook.getSheet(properties.getReportSheetName());
+			Sheet reportSheet = workbook.getSheet(properties.getReportSheetName());
 
-			Iterator<Row> rowIterator = tsSheet.iterator();
+			Iterator<Row> rowIterator = reportSheet.iterator();
 
 			skipFirst(rowIterator, properties.getRowOffset());
 
