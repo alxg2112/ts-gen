@@ -1,0 +1,19 @@
+###################
+# Report Generator#
+###################
+report.generator:
+  template-filename: Template.xlsx
+  report-sheet-name: For
+  row-offset: 1
+  column-offset: 0
+
+################
+# API Endpoint #
+################
+generation.endpoint:
+  # Content Type
+  content-type: application/octet-stream
+
+  # Headers
+  response-headers:
+    Content-Disposition: inline; filename=%FILENAME%
