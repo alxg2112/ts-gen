@@ -31,12 +31,12 @@ public class ReportGenerationEndpoint {
 
 	@RequestMapping(value = "/generate-report", method = RequestMethod.POST)
 	public void generateReport(@RequestBody String rawCsv, HttpServletResponse httpServletResponse) throws IOException {
-		ByteArrayOutputStream reportOutputStream = reportGenerator.generateReport(rawCsv);
+		byte[] reportBytes = reportGenerator.generateReport(rawCsv);
 
 		httpServletResponse.setContentType("application/octet-stream");
 		httpServletResponse.setHeader("Content-Disposition", "inline; filename=YourReportSir.xlsx");
-		httpServletResponse.setContentLength(reportOutputStream.size());
-		ByteStreams.copy(new ByteArrayInputStream(reportOutputStream.toByteArray()), httpServletResponse.getOutputStream());
+		httpServletResponse.setContentLength(reportBytes.length);
+		ByteStreams.copy(new ByteArrayInputStream(reportBytes), httpServletResponse.getOutputStream());
 	}
 
 	@RequestMapping(value = "/sample-report", method = RequestMethod.GET)
@@ -44,11 +44,11 @@ public class ReportGenerationEndpoint {
 		String rawCsv = Files.readAllLines(Paths.get(SAMPLE_CSV_FILE)).stream()
 				.collect(Collectors.joining("\n"));
 
-		ByteArrayOutputStream reportOutputStream = reportGenerator.generateReport(rawCsv);
+		byte[] reportBytes = reportGenerator.generateReport(rawCsv);
 
 		httpServletResponse.setContentType("application/octet-stream");
 		httpServletResponse.setHeader("Content-Disposition", "inline; filename=YourReportSir.xlsx");
-		httpServletResponse.setContentLength(reportOutputStream.size());
-		ByteStreams.copy(new ByteArrayInputStream(reportOutputStream.toByteArray()), httpServletResponse.getOutputStream());
+		httpServletResponse.setContentLength(reportBytes.length);
+		ByteStreams.copy(new ByteArrayInputStream(reportBytes), httpServletResponse.getOutputStream());
 	}
 }

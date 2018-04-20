@@ -36,7 +36,7 @@ public class ReportGenerator {
 		this.properties = properties;
 	}
 
-	public ByteArrayOutputStream generateReport(String rawCsvContent) throws IOException {
+	public byte[] generateReport(String rawCsvContent) throws IOException {
 		List<String> csvLines = LF_SPLITTER.omitEmptyStrings().splitToList(rawCsvContent);
 
 		List<List<String>> csvContent = csvLines.stream()
@@ -71,15 +71,14 @@ public class ReportGenerator {
 				}
 			}
 
-			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-			try {
+			byte[] reportBytes = new byte[0];
+			try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 				workbook.write(outputStream);
-				outputStream.flush();
-				outputStream.close();
+				reportBytes = outputStream.toByteArray();
 			} catch (IOException e) {
 				LOGGER.warn("Cannot generate report.", e);
 			}
-			return outputStream;
+			return reportBytes;
 		}
 	}
 
