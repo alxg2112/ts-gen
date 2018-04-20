@@ -74,12 +74,10 @@ public class ReportGenerator {
 
 			XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
 
-			byte[] reportBytes = new byte[0];
+			byte[] reportBytes;
 			try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
 				workbook.write(outputStream);
 				reportBytes = outputStream.toByteArray();
-			} catch (IOException e) {
-				LOGGER.warn("Cannot generate report.", e);
 			}
 			return reportBytes;
 		}
