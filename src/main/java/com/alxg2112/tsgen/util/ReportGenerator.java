@@ -15,6 +15,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -70,6 +71,8 @@ public class ReportGenerator {
 					currentCell.setCellValue(csvValue);
 				}
 			}
+
+			XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
 
 			byte[] reportBytes = new byte[0];
 			try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
