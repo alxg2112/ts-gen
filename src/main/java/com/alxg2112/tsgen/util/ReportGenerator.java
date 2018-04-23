@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Splitter;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReportGenerator {
 
-	private static final Splitter LF_SPLITTER = Splitter.on('\n');
+	private static final Splitter UNIFIED_LINE_SPLITTER = Splitter.on(Pattern.compile("\r|\n|\r\n"));
 	private static final Splitter COMMA_SPLITTER = Splitter.on(',');
 
 	private final ReportGeneratorProperties properties;
@@ -38,7 +39,7 @@ public class ReportGenerator {
 	}
 
 	public byte[] generateReport(String rawCsvContent) throws IOException {
-		List<String> csvLines = LF_SPLITTER.omitEmptyStrings().splitToList(rawCsvContent);
+		List<String> csvLines = UNIFIED_LINE_SPLITTER.omitEmptyStrings().splitToList(rawCsvContent);
 
 		List<List<String>> csvContent = csvLines.stream()
 				.map(COMMA_SPLITTER::split)
@@ -67,6 +68,7 @@ public class ReportGenerator {
 
 				while (cellIterator.hasNext() && csvValueIterator.hasNext()) {
 					Cell currentCell = cellIterator.next();
+					reportSheet.autoSizeColumn(currentCell.getColumnIndex());
 					String csvValue = csvValueIterator.next();
 					currentCell.setCellValue(csvValue);
 				}
