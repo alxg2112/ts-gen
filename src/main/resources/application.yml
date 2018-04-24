@@ -1,9 +1,11 @@
+server.port: 1948
+
 ####################
 # Report Generator #
 ####################
 report.generator:
-  template-filename: Template.xlsx
-  report-sheet-name: For
+  template-filename: 'Template.xlsx'
+  report-sheet-name: 'For'
   row-offset: 1
   column-offset: 0
 
@@ -12,8 +14,10 @@ report.generator:
 #########################
 generation.controller:
   # Content Type
-  content-type: application/octet-stream
+  content-type: 'application/octet-stream'
 
   # Headers
   response-headers:
-    Content-Disposition: inline; filename=%FILENAME%
+    Content-Disposition: 'inline; filename=%FILENAME%'
+    Access-Control-Allow-Origin: '*'
+    Access-Control-Allow-Methods: 'GET, POST, DELETE, PUT, OPTIONS, HEAD'
