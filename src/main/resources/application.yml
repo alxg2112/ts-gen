@@ -1,16 +1,16 @@
-###################
-# Report Generator#
-###################
+####################
+# Report Generator #
+####################
 report.generator:
   template-filename: Template.xlsx
   report-sheet-name: For
   row-offset: 1
   column-offset: 0
 
-################
-# API Endpoint #
-################
-generation.endpoint:
+#########################
+# Generation Controller #
+#########################
+generation.controller:
   # Content Type
   content-type: application/octet-stream
 

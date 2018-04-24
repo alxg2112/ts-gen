@@ -16,31 +16,35 @@ import org.springframework.web.bind.annotation.*;
  * @author Alexander Gryshchenko
  */
 @RestController
-public class ReportGenerationEndpoint {
+public class ReportGenerationController {
 
 	private static final String SAMPLE_CSV_FILE = "Sample.csv";
 	private static final String REPORT_FILENAME_PLACEHOLDER = "%FILENAME%";
+	private static final String XLSX_EXTENSION = "xlsx";
 
 	// TODO: generate report filename dynamically
-	private static final String REPORT_FILENAME = "YourReportSir.xlsx";
+	private static final String DEFAULT_REPORT_FILENAME = "YourReportSir";
 
-	private final ReportGenerationEndpointProperties properties;
+	private final ReportGenerationControllerProperties properties;
 	private final ReportGenerator reportGenerator;
 
-	public ReportGenerationEndpoint(ReportGenerationEndpointProperties properties,
-									ReportGenerator reportGenerator) {
+	public ReportGenerationController(ReportGenerationControllerProperties properties,
+									  ReportGenerator reportGenerator) {
 		this.properties = properties;
 		this.reportGenerator = reportGenerator;
 	}
 
 	@RequestMapping(value = "/generate-report", method = RequestMethod.GET)
-	public void generateReportFromCsvRequestParam(@RequestParam(name = "raw-csv") String rawCsv, HttpServletResponse httpServletResponse) throws IOException {
-		writeReportToResponse(rawCsv, REPORT_FILENAME, httpServletResponse);
+	public void generateReportFromCsvRequestParam(@RequestParam(name = "raw-csv") String rawCsv,
+												  @RequestParam(name = "report-filename", required = false) String reportFilename,
+												  HttpServletResponse httpServletResponse) throws IOException {
+		writeReportToResponse(rawCsv, reportFilename == null ? DEFAULT_REPORT_FILENAME : reportFilename, httpServletResponse);
 	}
 
+	@Deprecated
 	@RequestMapping(value = "/generate-report", method = RequestMethod.POST)
 	public void generateReportFromCsvBody(@RequestBody String rawCsv, HttpServletResponse httpServletResponse) throws IOException {
-		writeReportToResponse(rawCsv, REPORT_FILENAME, httpServletResponse);
+		writeReportToResponse(rawCsv, DEFAULT_REPORT_FILENAME, httpServletResponse);
 	}
 
 	@RequestMapping(value = "/sample-report", method = RequestMethod.GET)
@@ -48,7 +52,7 @@ public class ReportGenerationEndpoint {
 		String rawCsv = Files.readAllLines(Paths.get(SAMPLE_CSV_FILE)).stream()
 				.collect(Collectors.joining("\n"));
 
-		writeReportToResponse(rawCsv, REPORT_FILENAME, httpServletResponse);
+		writeReportToResponse(rawCsv, DEFAULT_REPORT_FILENAME, httpServletResponse);
 	}
 
 	private void writeReportToResponse(String rawCsv,
@@ -58,8 +62,10 @@ public class ReportGenerationEndpoint {
 
 		httpServletResponse.setContentType(properties.getResponseContentType());
 
+		String filenameWithExtension = reportFilename + '.' + XLSX_EXTENSION;
+
 		EntryStream.of(properties.getResponseHeaders())
-				.mapValues(headerValue -> headerValue.replace(REPORT_FILENAME_PLACEHOLDER, reportFilename))
+				.mapValues(headerValue -> headerValue.replace(REPORT_FILENAME_PLACEHOLDER, filenameWithExtension))
 				.forKeyValue(httpServletResponse::setHeader);
 
 		httpServletResponse.setContentLength(reportBytes.length);

@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
  */
 @Data
 @Component
-@ConfigurationProperties("generation.endpoint")
-public class ReportGenerationEndpointProperties {
+@ConfigurationProperties("generation.controller")
+public class ReportGenerationControllerProperties {
 
 	private String responseContentType;
 	private Map<String, String> responseHeaders;

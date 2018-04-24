@@ -68,7 +68,6 @@ public class ReportGenerator {
 
 				while (cellIterator.hasNext() && csvValueIterator.hasNext()) {
 					Cell currentCell = cellIterator.next();
-					reportSheet.autoSizeColumn(currentCell.getColumnIndex());
 					String csvValue = csvValueIterator.next();
 					currentCell.setCellValue(csvValue);
 				}
