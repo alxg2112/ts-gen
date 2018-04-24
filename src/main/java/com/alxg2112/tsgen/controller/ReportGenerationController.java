@@ -3,6 +3,8 @@ package com.alxg2112.tsgen.controller;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
@@ -63,9 +65,10 @@ public class ReportGenerationController {
 		httpServletResponse.setContentType(properties.getResponseContentType());
 
 		String filenameWithExtension = reportFilename + '.' + XLSX_EXTENSION;
+		String encodedFilenameWithExtension = URLEncoder.encode(filenameWithExtension, StandardCharsets.UTF_8.name());
 
 		EntryStream.of(properties.getResponseHeaders())
-				.mapValues(headerValue -> headerValue.replace(REPORT_FILENAME_PLACEHOLDER, filenameWithExtension))
+				.mapValues(headerValue -> headerValue.replace(REPORT_FILENAME_PLACEHOLDER, encodedFilenameWithExtension))
 				.forKeyValue(httpServletResponse::setHeader);
 
 		httpServletResponse.setContentLength(reportBytes.length);
