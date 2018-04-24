@@ -3,14 +3,14 @@ package com.alxg2112.tsgen.controller;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Collectors;
 
+import com.alxg2112.tsgen.util.ReportFilenameGenerator;
 import com.alxg2112.tsgen.util.ReportGenerator;
 import com.google.common.io.ByteStreams;
+import com.google.common.net.UrlEscapers;
 import one.util.streamex.EntryStream;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,18 +29,24 @@ public class ReportGenerationController {
 
 	private final ReportGenerationControllerProperties properties;
 	private final ReportGenerator reportGenerator;
+	private final ReportFilenameGenerator reportFilenameGenerator;
 
 	public ReportGenerationController(ReportGenerationControllerProperties properties,
-									  ReportGenerator reportGenerator) {
+									  ReportGenerator reportGenerator,
+									  ReportFilenameGenerator reportFilenameGenerator) {
 		this.properties = properties;
 		this.reportGenerator = reportGenerator;
+		this.reportFilenameGenerator = reportFilenameGenerator;
 	}
 
 	@RequestMapping(value = "/generate-report", method = RequestMethod.GET)
 	public void generateReportFromCsvRequestParam(@RequestParam(name = "raw-csv") String rawCsv,
-												  @RequestParam(name = "report-filename", required = false) String reportFilename,
+												  @RequestParam(name = "surname", required = false) String surname,
 												  HttpServletResponse httpServletResponse) throws IOException {
-		writeReportToResponse(rawCsv, reportFilename == null ? DEFAULT_REPORT_FILENAME : reportFilename, httpServletResponse);
+		String reportName = surname == null
+				? DEFAULT_REPORT_FILENAME
+				: reportFilenameGenerator.generateReportFilename(surname);
+		writeReportToResponse(rawCsv, reportName, httpServletResponse);
 	}
 
 	@Deprecated
@@ -65,10 +71,10 @@ public class ReportGenerationController {
 		httpServletResponse.setContentType(properties.getResponseContentType());
 
 		String filenameWithExtension = reportFilename + '.' + XLSX_EXTENSION;
-		String encodedFilenameWithExtension = URLEncoder.encode(filenameWithExtension, StandardCharsets.UTF_8.name());
+		String escapedFilenameWithExtension = UrlEscapers.urlFragmentEscaper().escape(filenameWithExtension);
 
 		EntryStream.of(properties.getResponseHeaders())
-				.mapValues(headerValue -> headerValue.replace(REPORT_FILENAME_PLACEHOLDER, encodedFilenameWithExtension))
+				.mapValues(headerValue -> headerValue.replace(REPORT_FILENAME_PLACEHOLDER, escapedFilenameWithExtension))
 				.forKeyValue(httpServletResponse::setHeader);
 
 		httpServletResponse.setContentLength(reportBytes.length);
