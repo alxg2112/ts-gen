@@ -1,4 +1,4 @@
-server.port: 1948
+server.port: 8080
 server.max-http-header-size: 65536 # 64K
 
 ####################
