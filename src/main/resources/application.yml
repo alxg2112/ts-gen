@@ -1,4 +1,5 @@
 server.port: 1948
+server.max-http-header-size: 65536 # 64K
 
 ####################
 # Report Generator #
