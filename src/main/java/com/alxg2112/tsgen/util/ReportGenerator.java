@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,27 +49,36 @@ public class ReportGenerator {
 		try (Workbook workbook = new XSSFWorkbook(excelTemplateFile)) {
 			Sheet reportSheet = workbook.getSheet(properties.getReportSheetName());
 
-			Iterator<Row> rowIterator = reportSheet.iterator();
+			int currentRowNumber = properties.getRowOffset();
+			for (List<String> csvRow : csvContent) {
 
-			skipNElements(rowIterator, properties.getRowOffset());
+				Row currentRow = reportSheet.getRow(currentRowNumber);
+				if (currentRow == null) {
+					currentRow = reportSheet.createRow(currentRowNumber);
+				}
 
-			Iterator<List<String>> csvContentIterator = csvContent.iterator();
+				int currentCellNumber = properties.getColumnOffset();
+				for (String csvValue : csvRow) {
 
-			while (rowIterator.hasNext() && csvContentIterator.hasNext()) {
+					Cell currentCell = currentRow.getCell(currentCellNumber);
+					if (currentCell == null) {
+						currentCell = currentRow.createCell(currentCellNumber);
+					}
 
-				Row currentRow = rowIterator.next();
-				Iterator<Cell> cellIterator = currentRow.cellIterator();
-
-				skipNElements(cellIterator, properties.getColumnOffset());
-
-				List<String> csvRow = csvContentIterator.next();
-				Iterator<String> csvValueIterator = csvRow.iterator();
-
-				while (cellIterator.hasNext() && csvValueIterator.hasNext()) {
-					Cell currentCell = cellIterator.next();
 					reportSheet.autoSizeColumn(currentCell.getColumnIndex());
-					String csvValue = csvValueIterator.next();
 					currentCell.setCellValue(csvValue);
+
+					currentCellNumber++;
+				}
+
+				currentRowNumber++;
+			}
+
+			int lastRowNum = reportSheet.getLastRowNum();
+			for (int rowPtr = currentRowNumber; rowPtr <= lastRowNum; rowPtr++) {
+				Row redundantRow = reportSheet.getRow(rowPtr);
+				if (redundantRow != null) {
+					reportSheet.removeRow(redundantRow);
 				}
 			}
 
@@ -82,13 +90,6 @@ public class ReportGenerator {
 				reportBytes = outputStream.toByteArray();
 			}
 			return reportBytes;
-		}
-	}
-
-	private void skipNElements(Iterator<?> iterator, int elementsToSkip) {
-		int remainingToSkip = elementsToSkip;
-		while (iterator.hasNext() && remainingToSkip-- > 0) {
-			iterator.next();
 		}
 	}
 }
